@@ -27,6 +27,23 @@ tasks = [
 
 colors = {"Databases": "rgb(226, 0, 246)", "UI/UX": "rgb(73, 246, 250)", "Senior Projects": "gray"}
 
+class Task(db.Model):
+    __tablename__ = 'tasks'
+    Task_id = db.Column(db.Integer, primary_key=True)
+    Userid = db.Column(db.Integer, nullable=False)
+    Task_name = db.Column(db.String(100), nullable=False)
+    Task_details = db.Column(db.String(500))
+    Task_duration = db.Column(db.Interval)
+    Deadline = db.Column(db.Date)
+
+class Activity(db.Model):
+    __tablename__ = 'activities'
+    activity_id = db.Column(db.Integer, primary_key=True)
+    activity_name = db.Column(db.String(100), nullable=False)
+    Userid = db.Column(db.Integer, nullable=False)
+    time = db.Column(db.DateTime, nullable=False)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -68,6 +85,30 @@ def test_db():
         error_text = "<p>The error:<br>" + str(e) + "</p>"
         hed = '<h1>Something is broken.</h1>'
         return hed + error_text
+
+@app.route('/add_task/', methods=['POST'])
+def add_task():
+    new_task = Task(
+        Userid=1, 
+        Task_name="Example Task",
+        Task_details="Details of Example Task",
+        Task_duration="1 day",  
+        Deadline="2024-05-01" 
+    )
+    db.session.add(new_task)
+    db.session.commit()
+    return redirect(url_for('dashboard'))
+
+@app.route('/add_activity/', methods=['POST'])
+def add_activity():
+    new_activity = Activity(
+        activity_name="Example Activity",
+        Userid=1,  
+        time="2024-05-01 12:00:00" 
+    )
+    db.session.add(new_activity)
+    db.session.commit()
+    return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
     app.run(debug=True)
